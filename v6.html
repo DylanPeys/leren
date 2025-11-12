@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>ENGELS POLITIETOETS Q1</title>
+  <style>
+    :root{
+      --primary:#007bff;
+      --primary-hover:#0056b3;
+      --ink:#222;
+      --muted:#666;
+      --border:#e5e7eb;
+      --bg:#f4f6f8;
+      --ok:green;
+      --bad:red;
+    }
+    *{box-sizing:border-box}
+    body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);margin:0;min-height:100vh;display:flex;flex-direction:column;align-items:center}
+    h1{margin-top:60px;font-size:28px}
+    h2{color:#555;margin:6px 0 24px}
+    .menu,.quiz{width:100%;max-width:920px;padding:0 16px}
+    .categories{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
+    .category{background:var(--primary);color:#fff;border:none;padding:12px 18px;border-radius:10px;cursor:pointer;font-size:15px}
+    .category:hover{background:var(--primary-hover)}
+    .quizHeader{display:flex;align-items:center;justify-content:center;gap:12px;margin-top:58px;position:relative}
+    #backTop{position:absolute;left:0;top:0;transform:translateY(-6px);background:#666;color:#fff;padding:6px 10px;border-radius:8px;border:none;cursor:pointer}
+    #backTop:hover{background:#444}
+    .switch{display:flex;gap:8px;align-items:center;justify-content:center;margin:10px 0 18px}
+    .switch label{font-weight:600}
+    .card{background:#fff;margin-top:28px;padding:26px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.06)}
+    .question{font-size:17px;margin:12px 0 8px}
+    .progress{color:var(--muted);font-size:14px;margin-bottom:12px}
+    .inputs{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+    input[type="text"]{width:100%;padding:10px 12px;font-size:15px;border:1px solid #ccc;border-radius:8px}
+    .actions{display:flex;gap:8px;align-items:center;margin-top:12px}
+    button.primary{background:var(--primary);color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer}
+    button.primary:hover{background:var(--primary-hover)}
+    button.secondary{background:#666;color:#fff;border:none;padding:10px 16px;border-radius:10px;cursor:pointer}
+    button.secondary:hover{background:#444}
+    #feedback{margin-top:10px;font-weight:700;min-height:1.2em}
+    .green{color:var(--ok)}
+    .red{color:var(--bad)}
+    .hidden{display:none}
+    .small{color:var(--muted);font-size:13px;margin-top:4px}
+    table{width:100%;border-collapse:collapse}
+    th,td{padding:8px;border-bottom:1px solid var(--border);text-align:left;vertical-align:top}
+    footer{margin-top:auto;color:#aaa;font-size:13px;padding:20px}
+  </style>
+</head>
+<body>
+  <!-- Home -->
+  <div class="menu" id="menu">
+<h1 style="text-align:center;">ENGELS POLITIETOETS Q1</h1>
+<h2 style="text-align:center;">OEFENEN</h2>
+    <div class="categories">
+      <button class="category" onclick="selectCategory('Verkeersbekeuringen')">Verkeersbekeuringen</button>
+      <button class="category" onclick="selectCategory('Giving a ticket')">Giving a ticket</button>
+      <button class="category" onclick="selectCategory('Giving a ticket (zinnen)')">Giving a ticket (zinnen)</button>
+      <button class="category" onclick="selectCategory('Giving a ticket (missing words)')">Giving a ticket (missing words)</button>
+      <button class="category" onclick="selectCategory('Traffic')">Traffic</button>
+      <button class="category" onclick="selectCategory('Voertuigcontrole')">Voertuigcontrole</button>
+      <button class="category" onclick="selectCategory('Voertuigcontrole (zinnen)')">Voertuigcontrole (zinnen)</button>
+      <button class="category" onclick="selectCategory('Describing People')">Describing People</button>
+      <button class="category" onclick="selectCategory('Giving Directions')">Giving Directions</button>
+      <button class="category" onclick="selectCategory('Community Policing')">Community Policing</button>
+      <button class="category" onclick="selectCategory('Personal Information')">Personal Information</button>
+	  
+    </div>
+	
+ <div id="shuffleBar" style="text-align:center; margin-top:24px;">
+    <input id="toggleShuffle" type="checkbox" />
+    <label for="toggleShuffle">Vink aan om vragen gehusseld te krijgen</label>
+  </div>
+</div>
+  </div>
+  
+  <!-- Quiz -->
+  <div class="quiz hidden" id="quiz">
+    <div class="quizHeader">
+      <button id="backTop" onclick="goBack()">← Terug</button>
+      <div>
+        <h2 id="categoryTitle" style="margin:0;text-align:center;"></h2>
+<div class="switch">
+  <label for="toggleLearn">Eerst leren?</label>
+  <input id="toggleLearn" type="checkbox" />
+</div>
+      </div>
+    </div>
+
+    <div class="card" id="qaCard">
+      <div class="progress" id="progress"></div>
+      <div class="question" id="question"></div>
+
+      <!-- Learn area -->
+      <div id="learnArea" class="small">
+        <div id="learnAnswer"></div>
+      </div>
+
+      <!-- Test area -->
+      <div id="testArea" class="hidden">
+        <div class="inputs" id="inputs"></div>
+      </div>
+
+      <div class="actions">
+        <button id="confirmBtn" class="primary" onclick="onConfirm()">Bevestig</button>
+        <button id="nextBtn" class="primary hidden" onclick="onNext()">Volgende</button>
+      </div>
+
+      <div id="feedback" aria-live="polite"></div>
+    </div>
+
+    <div id="results" class="hidden card" style="margin-top:20px;">
+      <h3>Resultaten</h3>
+      <p id="summary"></p>
+      <table id="resultsTable"></table>
+      <div class="actions">
+        <button class="secondary" onclick="goBack()">Terug naar Home</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>© PEYS productions - build 20.5</footer>
+
+  <script>
+    /* ===========
+       DATA (alle vragen)
+       =========== */
+    const data = {
+      "Verkeersbekeuringen": {
+        type: "pairs",
+        items: [
+          {prompt:"bumperkleven",answer:"tailgating"},
+          {prompt:"door rood licht rijden",answer:"running a red light"},
+          {prompt:"Rijden zonder gordel",answer:"driving without a seatbelt"},
+          {prompt:"Rijden met een kapot achterlicht",answer:"driving with a broken taillight"},
+          {prompt:"in verboden richting rijden",answer:"driving the wrong way"},
+          {prompt:"Inhalen waar een inhaalverbod geldt",answer:"overtaking where overtaking is prohibited"},
+          {prompt:"Geen richting aangeven",answer:"not using turn signals"},
+          {prompt:"Onnodig links rijden",answer:"unnecessarily driving in the left lane"},
+          {prompt:"rijdend je mobiel vasthouden",answer:"holding your phone while driving"},
+          {prompt:"Te hard rijden",answer:"speeding"},
+          {prompt:"Slingerend over de weg",answer:"swerving on the road"},
+          {prompt:"Geen voorrang verleend",answer:"failing to give right of way"},
+          {prompt:"Stopbord genegeerd",answer:"ignoring a stop sign"}
+        ]
+      },
+
+      "Giving Directions": {
+        type: "pairs",
+        items: [
+          {prompt:"aankomen bij",answer:"to arrive at"},
+          {prompt:"afrit",answer:"exit"},
+          {prompt:"doodlopende straat",answer:"dead-end street/road"},
+          {prompt:"doorgaand verkeer",answer:"through traffic"},
+          {prompt:"driekwart (rotonde)",answer:"the third exit/turn (off the roundabout)"},
+          {prompt:"duren (van A naar B)",answer:"it takes"},
+          {prompt:"dwarsstraat",answer:"cross street"},
+          {prompt:"eigen weg",answer:"private road"},
+          {prompt:"fietser",answer:"cyclist"},
+          {prompt:"fietspad",answer:"cycle/bicycle path (of: cycle/bicycle lane)"},
+          {prompt:"Ga rechtdoor.",answer:"Go straight on/straight ahead."},
+          {prompt:"Ga rechtsaf",answer:"Go right. Turn right. Make a right. Take a right."},
+          {prompt:"hoek (van de straat)",answer:"corner (of the street), street corner"},
+          {prompt:"ingang",answer:"entrance"},
+          {prompt:"kant van de weg",answer:"roadside, side of the road"},
+          {prompt:"kruisen",answer:"to cut across, to intersect"},
+          {prompt:"kruising met verkeerslichten",answer:"intersection with traffic lights"},
+          {prompt:"kruising/kruispunt",answer:"crossing, crossroads, intersection, junction"},
+          {prompt:"linkerkant (aan de)",answer:"on the left, on the left hand side"},
+          {prompt:"onderdoorgang (weg)",answer:"underpass"},
+          {prompt:"ongelijkvloerse kruising",answer:"flyover, overpass (AmE)"},
+          {prompt:"onverharde weg",answer:"unsurfaced road, dirt road"},
+          {prompt:"openbare weg",answer:"public road"},
+          {prompt:"oprit (van een garage)",answer:"drive, driveway"},
+          {prompt:"oprit (van een snelweg)",answer:"slip road, ramp (AmE)"},
+          {prompt:"oversteken",answer:"to cross (the street)"},
+          {prompt:"pad",answer:"path"},
+          {prompt:"parallelweg",answer:"road parallel to the highway"},
+          {prompt:"parkeergarage",answer:"multi-storey car park, parking garage (AmE)"},
+          {prompt:"parkeerplaats",answer:"parking area, a place to park a car"}
+        ]
+      },
+
+      "Giving a ticket (zinnen)": {
+        type: "pairs",
+        items: [
+          {prompt:"De reden dat ik u aan de kant zet is omdat ik zag dat u tijdens het rijden geen gordel draagt.",answer:"The reason I pulled you over is because I saw (that) you were not wearing a seatbelt while driving."},
+          {prompt:"De reden dat ik u aan de kant zet is omdat ik zag dat u tijdens het rijden uw mobiele telefoon in uw hand had.",answer:"The reason I pulled you over is because I saw you were holding your mobile phone while driving."},
+          {prompt:"De reden dat ik u aan de kant zet is omdat...",answer:"The reason I pulled you over is because..."},
+          {prompt:"U fietst in een voetgangersgebied.",answer:"You are cycling in a pedestrian area."},
+          {prompt:"U krijgt hiervoor een bekeuring.",answer:"You will get a ticket for that. (of: you are getting a ticket for that.)"},
+          {prompt:"De boete is 250 euro plus 9 euro administratiekosten.",answer:"The fine is 250 euros plus 9 euros administration costs."},
+          {prompt:"Mag ik uw identiteitsbewijs zien?",answer:"Can I see your ID, please? (of: Can you identify yourself?)"},
+          {prompt:"Mag ik uw rijbewijs en kentekenbewijs alstublieft?",answer:"May/Can I see your driving licence and car registration please?"},
+          {prompt:"Is dit uw huidige adres?",answer:"Is this your home address?"},
+          {prompt:"Binnen 1 tot 2 weken ontvangt u een beschikking bij u thuis.",answer:"You will receive the ticket within 1 or 2 weeks at your home address."},
+          {prompt:"U bent niet verplicht om op mijn vragen te antwoorden.",answer:"You don’t have to answer my questions (but why ...)"},
+          {prompt:"Kunt u uitleggen waarom u ...?",answer:"Can you explain why you ...?"},
+          {prompt:"Kunt u uitleggen waarom u te hard reed?",answer:"Can you explain why you were speeding?"},
+          {prompt:"Waarom reed u te hard?",answer:"Why were you speeding?"},
+          {prompt:"Kunt u uitleggen waarom u door het rode licht reed?",answer:"Can you explain why you ignored the red light?"},
+          {prompt:"Waarom reed u door het rode licht?",answer:"Why did you ignore the red light?"},
+          {prompt:"Kan ik dat als uw verklaring opschrijven?",answer:"Can I write that down as your statement?"},
+          {prompt:"Als u het niet eens bent met de bekeuring, dan kunt u in bezwaar gaan.",answer:"If you don’t agree with the ticket, you can appeal against it."},
+          {prompt:"De informatie over de bezwaar procedure vindt u op de website van het CJIB.",answer:"You can find all the information about the appeal procedure on the website of the CJIB."}
+        ]
+      },
+
+      "Giving a ticket (missing words)": {
+        type: "missing",
+        items: [
+          {prompt:"Good morning /afternoon /evening, Sir/Madam/Ms (Ma’am is American English)\nWe are ..... a traffic .....", answers:["doing/conducting","check"]},
+          {prompt:"Could you please turn off your .....", answers:["engine"]},
+          {prompt:"The reason I ..... you over is because", answers:["pulled"]},
+          {prompt:"I saw you ..... without your seatbelt on.", answers:["driving"]},
+          {prompt:"I saw you ..... your mobile phone while driving.", answers:["holding"]},
+          {prompt:"I saw you go ..... the red light.", answers:["through"]},
+          {prompt:"I saw you ..... speeding.", answers:["were"]},
+          {prompt:"This is not ..... in the Netherlands.", answers:["allowed"]},
+          {prompt:"It’s ..... for you and for others who are using the road.", answers:["dangerous"]},
+          {prompt:"You are going to get a ..... for that.", answers:["ticket"]},
+          {prompt:"I would like to see your driver’s ..... and car registration, please.", answers:["licence/license"]},
+          {prompt:"You don’t have to ..... any of my questions. Do you understand?", answers:["answer"]},
+          {prompt:"Would you like to ..... a ..... (verklaring)?", answers:["make/give","statement"]},
+          {prompt:"Why ..... you driving without your seatbelt on?", answers:["were"]},
+          {prompt:"Why ..... you holding your phone while driving?", answers:["were"]},
+          {prompt:"Why ..... you go through the red light?", answers:["did"]},
+          {prompt:"Why ..... you speeding?", answers:["were"]},
+          {prompt:"The ..... is 250 euros plus 9 euros administration costs.", answers:["fine"]},
+          {prompt:"(Dutch or EU address): You don’t have to pay .....", answers:["immediately/right now"]},
+          {prompt:"In 1 to 2 weeks you will receive a letter at your home address. This letter is a ..... (beschikking).", answers:["penalty notice"]},
+          {prompt:"On the ..... (beschikking) you can find the bank account number of the CJIB. You can transfer the money to this account.", answers:["penalty notice"]},
+          {prompt:"If you do not ..... with the ticket I’m giving you, you can ..... it.", answers:["agree","appeal against"]},
+          {prompt:"Your letter of ..... should be sent to the address on the notice.", answers:["appeal"]},
+          {prompt:"Thank you for your .....", answers:["cooperation"]}
+        ]
+      },
+
+      "Giving a ticket": {
+        type: "pairs",
+        items: [
+          {prompt:"acceptgiro",answer:"bank payment order"},
+          {prompt:"APK keuring",answer:"(periodic) inspection"},
+          {prompt:"APK keuringsbewijs",answer:"inspection certificate (of: MOT certificate (BrE))"},
+          {prompt:"bekeuring",answer:"ticket (of: citation (AmE))"},
+          {prompt:"bekeuring krijgen",answer:"to get/to receive a ticket (of: to be fined)"},
+          {prompt:"bekeuring uitschrijven",answer:"to write a ticket"},
+          {prompt:"beschikking",answer:"penalty notice (of: penalty decision)"},
+          {prompt:"boete",answer:"fine"},
+          {prompt:"bumperkleven",answer:"to tailgate (I saw you tailgating. You are getting a ticket for tailgating.)"},
+          {prompt:"door rood licht rijden",answer:"to go through/to run/to ignore/to drive through a red light"},
+          {prompt:"handelen i.s.m. verkeersvoorschriften",answer:"to commit a traffic violation"},
+          {prompt:"(uw) identiteit bevestigen",answer:"to confirm (your) identity"},
+          {prompt:"in verboden richting rijden",answer:"to drive in the wrong direction on a one-way street"},
+          {prompt:"inhaalverbod",answer:"no overtaking"},
+          {prompt:"inhalen",answer:"to overtake"},
+          {prompt:"kantonrechter",answer:"subdistrict court"},
+          {prompt:"kentekenbewijs",answer:"vehicle registration certificate"},
+          {prompt:"officier van justitie",answer:"public prosecutor (of: district attorney (AmE))"},
+          {prompt:"pinnen / geld opnemen",answer:"to get/withdraw cash/money from an ATM (of: to pay with a cash card)"},
+          {prompt:"richting aangeven",answer:"to indicate direction"},
+          {prompt:"rijbewijs",answer:"driving licence (of: driver's license (AmE))"},
+          {prompt:"rijdend je mobiel vasthouden",answer:"holding a mobile phone while driving"},
+          {prompt:"U reed 50 waar u 30 mag.",answer:"You were doing 50 in a 30 zone."},
+          {prompt:"U reed te hard.",answer:"You were speeding."},
+          {prompt:"valse naam",answer:"false name (of: false identity)"},
+          {prompt:"veiligheid van het verkeer in gevaar brengen",answer:"to endanger road traffic safety"},
+          {prompt:"verkeer stilleggen",answer:"to hold up traffic"},
+          {prompt:"Verkeer van rechts heeft voorrang.",answer:"Traffic from the right has priority/the right of way."},
+          {prompt:"verkeersboete",answer:"traffic fine"},
+          {prompt:"verkeersbord",answer:"traffic sign (of: road sign)"},
+          {prompt:"verkeerscontrole",answer:"traffic (spot) check"},
+          {prompt:"verkeersdelict",answer:"traffic offence"},
+          {prompt:"verkeershandhaving",answer:"traffic law enforcement"},
+          {prompt:"verkeerslichten",answer:"traffic lights"},
+          {prompt:"verkeersovertreding",answer:"traffic violation"},
+          {prompt:"verkeersregels",answer:"traffic regulations"},
+          {prompt:"verklaring",answer:"statement (of: explanation)"},
+          {prompt:"voorrang hebben",answer:"to have the right of way (of: to have priority)"},
+          {prompt:"voorrang verlenen of geven",answer:"to give way (of: to yield (AmE))"},
+          {prompt:"wegtekens",answer:"road markings"}
+        ]
+      },
+
+      "Traffic": {
+        type: "pairs",
+        items: [
+          {prompt:"(de) achtervolging inzetten",answer:"to set off in pursuit (of: to give chase)"},
+          {prompt:"aanrijding",answer:"collision"},
+          {prompt:"aansprakelijkheid",answer:"liability"},
+          {prompt:"achtervolgen",answer:"to pursue (of: to chase) (of: to chase after)"},
+          {prompt:"afzetten (van de weg)",answer:"to cordon off (of: to close)"},
+          {prompt:"all-risk verzekering",answer:"comprehensive insurance"},
+          {prompt:"auto aanhouden",answer:"to stop a car (of: to pull over a car)"},
+          {prompt:"belemmeren",answer:"to obstruct"},
+          {prompt:"berm",answer:"verge (of: shoulder (AmE))"},
+          {prompt:"bestelauto",answer:"van"},
+          {prompt:"besturen (gemotoriseerde voertuig)",answer:"to drive"},
+          {prompt:"betrokken bij",answer:"involved in"},
+          {prompt:"blikschade",answer:"damage to the bodywork"},
+          {prompt:"bocht",answer:"bend (of: curve)"},
+          {prompt:"botsen",answer:"to hit (of: to collide with) (of: to crash into)"},
+          {prompt:"botsing",answer:"collision"},
+          {prompt:"bromfiets",answer:"moped"},
+          {prompt:"deuk",answer:"dent"},
+          {prompt:"discretionaire bevoegdheid",answer:"discretionary authority"},
+          {prompt:"doorgaand verkeer",answer:"through traffic"},
+          {prompt:"doorgetrokken streep",answer:"solid line"},
+          {prompt:"doorlaatpost",answer:"checkpoint"},
+          {prompt:"eigen risico",answer:"policy excess (of: deductible (AmE))"},
+          {prompt:"eigen weg",answer:"private road"},
+          {prompt:"Europese Schadeformulier",answer:"European Accident Form/Damage Form"},
+          {prompt:"file",answer:"traffic jam (of: traffic queue) (of: traffic tailback)"},
+          {prompt:"frontale botsing",answer:"head-on collision"},
+          {prompt:"gas geven",answer:"to accelerate (of: to accelerate away) (of: to increase speed) (of: to step on it)"},
+          {prompt:"gedragsregels (verkeer)",answer:"(highway/driving) code (of: traffic rules)"},
+          {prompt:"geen doorgang",answer:"no throughway"},
+          {prompt:"geluidsoverlast",answer:"noise nuisance"},
+          {prompt:"gevarenlichten",answer:"hazard lights"},
+          {prompt:"gezichtsveld",answer:"range of vision (of: field of vision)"},
+          {prompt:"glad wegdek",answer:"slippery road/surface"},
+          {prompt:"hoofdweg",answer:"main road (of: major road)"},
+          {prompt:"inhouden, intrekken (rijbewijs)",answer:"to suspend (a driving licence/driver’s license)"},
+          {prompt:"invoegen",answer:"to merge"},
+          {prompt:"invoegstrook",answer:"merging lane, acceleration lane"},
+          {prompt:"inzittenden",answer:"occupants"},
+          {prompt:"kettingbotsing",answer:"pile-up, chain collision"},
+          {prompt:"keuren (onderzoeken)",answer:"to inspect/examine/check"},
+          {prompt:"kop-staart botsing",answer:"rear-end collision"},
+          {prompt:"kras",answer:"scratch"},
+          {prompt:"krik",answer:"jack"},
+          {prompt:"laden en lossen",answer:"to load and unload"},
+          {prompt:"lantaarnpaal",answer:"lamppost"},
+          {prompt:"lekke band",answer:"flat tyre, punctured tyre (tire - AmE)"},
+          {prompt:"liften",answer:"to hitchhike"},
+          {prompt:"markering",answer:"marking, road marking"},
+          {prompt:"middenberm",answer:"central reservation, median strip"},
+          {prompt:"motorfiets",answer:"motorcycle, motorbike"},
+          {prompt:"motorpech",answer:"engine trouble"},
+          {prompt:"naderen",answer:"to approach"},
+          {prompt:"navigatie systeem",answer:"satellite navigation system, GPS"},
+          {prompt:"omleiden",answer:"to divert traffic, to detour traffic (AmE)"},
+          {prompt:"omleiding, omlegging",answer:"diversion, detour (AmE)"},
+          {prompt:"omrijden",answer:"to detour, to make a detour"},
+          {prompt:"(iemand) omverrijden",answer:"to knock down (someone)"},
+          {prompt:"onbelemmerd",answer:"unhindered"},
+          {prompt:"onderbroken streep",answer:"broken line"},
+          {prompt:"ontzegging van rijbevoegdheid",answer:"disqualification from driving"},
+          {prompt:"openbaar vervoer",answer:"public transport, public transportation"},
+          {prompt:"opstopping (verkeer)",answer:"traffic jam, traffic congestion"},
+          {prompt:"over de kop slaan",answer:"to overturn (car), to go over the handlebars (bicycle)"},
+          {prompt:"overrijden (iemand of iets)",answer:"to run over (someone or something)"},
+          {prompt:"oversteekplaats (voor voetgangers)",answer:"pedestrian crossing"},
+          {prompt:"parkeerhaven, plaats langs de weg",answer:"lay-by, pullover area"},
+          {prompt:"passagier(s)",answer:"passenger(s)"},
+          {prompt:"personenauto",answer:"car, passenger car, automobile (AmE)"},
+          {prompt:"pijl",answer:"arrow"},
+          {prompt:"praatpaal",answer:"roadside telephone"},
+          {prompt:"rechtdoor",answer:"straight on, straight ahead"},
+          {prompt:"rechts houden",answer:"(to) keep right"},
+          {prompt:"regelen (verkeer)",answer:"to control traffic, to direct traffic"},
+          {prompt:"remsporen",answer:"skid marks, brake marks"},
+          {prompt:"remweg",answer:"braking distance, stopping distance"},
+          {prompt:"richting aangeven",answer:"to indicate direction"},
+          {prompt:"rijvaardigheid",answer:"driving ability/skills"},
+          {prompt:"schade vaststellen",answer:"to assess/determine the damage"},
+          {prompt:"schade veroorzaken",answer:"to cause damage"},
+          {prompt:"schadeformulier",answer:"claim report, claim form"},
+          {prompt:"schatten (de schade schatten)",answer:"to estimate (to estimate the damage)"},
+          {prompt:"schatting",answer:"estimate"},
+          {prompt:"situatieschets",answer:"situation sketch, sketch/drawing of the situation"},
+          {prompt:"slecht wegdek",answer:"bad road surface"},
+          {prompt:"slecht zicht",answer:"poor visibility"},
+          {prompt:"slepen, sleepkabel",answer:"to tow, tow-rope"},
+          {prompt:"snelheidscontrole",answer:"speed check"},
+          {prompt:"snelheidsovertreding",answer:"speeding violation"},
+          {prompt:"spaak",answer:"spoke"},
+          {prompt:"splitsing van weg",answer:"road junction"},
+          {prompt:"spookrijder motorist",answer:"travelling on the wrong side of the road"},
+          {prompt:"sturen",answer:"to steer"},
+          {prompt:"stuurloos",answer:"out of control"},
+          {prompt:"total loss",answer:"total loss, write-off"},
+          {prompt:"uitwijken",answer:"to swerve"},
+          {prompt:"verkeer",answer:"traffic"},
+          {prompt:"verkeerscontrole",answer:"traffic check (We're conducting/carrying out/doing a spot traffic check.)"},
+          {prompt:"verkeersdeelnemer",answer:"road user"},
+          {prompt:"verkeersveiligheid",answer:"road safety"},
+          {prompt:"verkeersvoorschriften",answer:"traffic rules, traffic regulations"},
+          {prompt:"verlopen rijbewijs",answer:"expired driving licence, expired driver's license (AmE) — “Your license has expired.”"},
+          {prompt:"vermijden",answer:"to avoid"},
+          {prompt:"verzekering/autoverzekering",answer:"insurance, car or automobile insurance"},
+          {prompt:"vierbaansweg",answer:"four-lane road"},
+          {prompt:"vluchtstrook",answer:"hard shoulder, emergency lane"},
+          {prompt:"vrachtauto/vrachtwagen",answer:"lorry, truck"},
+          {prompt:"vrijmaken",answer:"to clear"},
+          {prompt:"Waarborgfonds Motorverkeer",answer:"Motor Traffic Guarantee Fund"},
+          {prompt:"waarschuwen",answer:"to warn"},
+          {prompt:"WA-verzekerd",answer:"insured for third party liability"},
+          {prompt:"werk in uitvoering/wegwerkzaamheden",answer:"road works"},
+          {prompt:"zijspan",answer:"sidecar"}
+        ]
+      },
+
+      "Voertuigcontrole (zinnen)": {
+        type: "pairs",
+        items: [
+          {prompt:"Goedemorgen, mijn naam is Bob van de nationale politie.",answer:"Good morning, my name is Bob of the Dutch police."},
+          {prompt:"We voeren vandaag een verkeerscontrole uit.",answer:"We are conducting a vehicle (spot) check today."},
+          {prompt:"Mag ik uw rijbewijs en autopapieren zien?",answer:"Can I see your license and registration (papers) please?"},
+          {prompt:"Is Arhemseweg 348 in Apeldoorn nog steeds uw huidige adres?",answer:"Is Arhemseweg 348 in Apeldoorn still your current address?"},
+          {prompt:"Staat de auto geregistreerd op uw naam?",answer:"Is the car registered in your name?"},
+          {prompt:"Ik ga eerst de lichten aan de voorkant van uw wagen controleren.",answer:"First I'm going to check the lights at the front of your car."},
+          {prompt:"Kunt u de linker richtingaanwijzer aanzetten?",answer:"Can you turn on the left indicator light?"},
+          {prompt:"Richtingaanwijzers, dimlicht, groot licht, alarmlichten",answer:"Direction indicators, low beams, high beams, emergency lights"},
+          {prompt:"Nu zal ik de lichten aan de achterkant van uw auto testen.",answer:"Now I’m going to check the rear lights of your car."},
+          {prompt:"Richtingaanwijzer, remlichten, mistlamp, achteruitrijlicht",answer:"Blinker, brake lights, fog lights, reversing lights"},
+          {prompt:"Alle lichten lijken goed te werken.",answer:"All the lights seem to be working properly."},
+          {prompt:"Ik ga nu kijken of er genoeg profiel op uw banden zit.",answer:"I’m now going to check the depth of the tread of your tires. (of: I’m going to see if there is enough tread on your tires.)"},
+          {prompt:"Uw rechtervoorwiel lijkt te zijn versleten.",answer:"Your front right tire seems to be worn."},
+          {prompt:"Kunt u de motorkap openen?",answer:"Can you pop the hood?"},
+          {prompt:"Ik ga uw accu controleren. Ik wil zien of deze goed geïnstalleerd is.",answer:"I’m going to check if your battery has been installed/fastened properly."},
+          {prompt:"Uw auto lekt olie / remvloeistof / koelvloeistof / ruitenwisservloeistof / een onbekende vloeistof.",answer:"Your car is leaking oil / brake fluid / coolant / windscreen wiper fluid / an unknown liquid."},
+          {prompt:"Er lijkt iets mis te zijn met de bedrading",answer:"There seems to be something wrong with the wiring."},
+          {prompt:"Kunt u de claxon indrukken? Kan ik uw autogordels even controleren?",answer:"Can you sound the horn? Can I check your seatbelts?"},
+          {prompt:"Ok, u kunt weer doorrijden. Bedankt voor uw medewerking.",answer:"All right, you can continue on your way (drive on). Thank you for your cooperation."}
+        ]
+      },
+
+      "Voertuigcontrole": {
+        type: "pairs",
+        items: [
+          {prompt:"Nederlandse politie",answer:"Dutch police."},
+          {prompt:"Verkeerscontrole",answer:"vehicle (spot) check"},
+          {prompt:"geregistreerd",answer:"registered"},
+          {prompt:"linker richtingaanwijzer",answer:"left indicator light"},
+          {prompt:"Richtingaanwijzers",answer:"Direction indicators"},
+          {prompt:"dimlicht",answer:"low beams"},
+          {prompt:"groot licht",answer:"high beams"},
+          {prompt:"alarmlichten",answer:"emergency lights"},
+          {prompt:"Richtingaanwijzer",answer:"Blinker"},
+          {prompt:"remlichten",answer:"brake lights"},
+          {prompt:"mistlamp",answer:"fog lights"},
+          {prompt:"achteruitrijlicht",answer:"reversing lights"},
+          {prompt:"banden",answer:"tires"},
+          {prompt:"versleten",answer:"worn"},
+          {prompt:"motorkap",answer:"hood"},
+          {prompt:"accu",answer:"battery"},
+          {prompt:"geïnstalleerd",answer:"installed/fastened properly"},
+          {prompt:"lekt olie",answer:"leaking oil"},
+          {prompt:"remvloeistof",answer:"brake fluid"},
+          {prompt:"koelvloeistof",answer:"coolant"},
+          {prompt:"ruitenwisservloeistof",answer:"windscreen wiper fluid"},
+          {prompt:"een onbekende vloeistof",answer:"an unknown liquid"},
+          {prompt:"bedrading",answer:"wiring"},
+          {prompt:"claxon",answer:"horn"},
+          {prompt:"autogordels",answer:"seatbelts"}
+        ]
+      },
+
+      "Community Policing": {
+        type: "pairs",
+        items: [
+          {prompt:"achterstandswijk",answer:"run-down area (of: disadvantaged area)"},
+          {prompt:"APV (Algemene Plaatselijke Verordening)",answer:"Municipal (of: Local By-laws)"},
+          {prompt:"burger",answer:"citizen"},
+          {prompt:"burgerwacht",answer:"neighbourhood watch"},
+          {prompt:"burgerzin",answer:"sense of public responsibility"},
+          {prompt:"daklozen",answer:"the homeless (of: homeless people)"},
+          {prompt:"doelstellingen",answer:"objectives"},
+          {prompt:"eisen",answer:"requirements"},
+          {prompt:"gebiedsgebonden team",answer:"a team allocated to a specific area"},
+          {prompt:"gemeenschappelijk veiligheidszorg",answer:"community policing"},
+          {prompt:"gemeenschappelijke veiligheidsaanpak",answer:"joint safety strategy model"},
+          {prompt:"gemeentehuis",answer:"city hall (of: town hall)"},
+          {prompt:"handhaving van de wet",answer:"upholding the law"},
+          {prompt:"Jeugdzorg",answer:"Youth Justice Board (of: Youth Welfare Board)"},
+          {prompt:"kerntaken",answer:"core tasks (of: main tasks)"},
+          {prompt:"leefbaarheid",answer:"quality of life"},
+          {prompt:"levensomstandigheden",answer:"living conditions"},
+          {prompt:"nazorg",answer:"after care"},
+          {prompt:"netwerkpartners",answer:"contacts outside the police force"},
+          {prompt:"noodhulp verlenen",answer:"to provide emergency help"},
+          {prompt:"oplossing",answer:"solution"},
+          {prompt:"partners",answer:"partners"},
+          {prompt:"plaatselijke autoriteiten",answer:"local authorities"},
+          {prompt:"probleemwijk",answer:"problem neighbourhood"},
+          {prompt:"samenwerking met externe partners",answer:"cooperation with external partners"},
+          {prompt:"samenwerking tussen de korpsen",answer:"cooperation between police forces"},
+          {prompt:"sociale voorzieningen",answer:"social services"},
+          {prompt:"taakafbakening",answer:"division of responsibilities (of: division of duties)"},
+          {prompt:"teamchef",answer:"team leader"},
+          {prompt:"veiligheid",answer:"safety"},
+          {prompt:"verantwoordelijkheid nemen",answer:"to take responsibility"},
+          {prompt:"wijkagent",answer:"community police officer (of: neighbourhood police officer) (of: local beat officer)"},
+          {prompt:"wijkscan",answer:"neighbourhood survey"},
+          {prompt:"wijkteam",answer:"community team"}
+        ]
+      },
+
+      "Describing People": {
+        type: "pairs",
+        items: [
+          /* lichaamsbouw */
+          {prompt:"atletisch",answer:"athletic"},
+          {prompt:"breed/krachtig",answer:"broad-shouldered"},
+          {prompt:"corpulent/dik",answer:"fat"},
+          {prompt:"dun",answer:"thin"},
+          {prompt:"gemiddeld",answer:"average"},
+          {prompt:"gespierd",answer:"muscular"},
+          {prompt:"groot",answer:"large"},
+          {prompt:"klein",answer:"small/short"},
+          {prompt:"mager",answer:"skinny"},
+          {prompt:"mollig",answer:"chubby"},
+          {prompt:"slank",answer:"slim"},
+          {prompt:"stevig",answer:"stocky"},
+          {prompt:"tenger",answer:"slight"},
+          {prompt:"vel over been",answer:"very skinny"},
+          {prompt:"zeer dik",answer:"obese"},
+          {prompt:"zwaar",answer:"heavy"},
+          {prompt:"gemiddeld (lengte)",answer:"medium/average"},
+          {prompt:"lang (lengte)",answer:"tall"},
+
+          /* gezicht / kenmerken */
+          {prompt:"gezicht",answer:"face"},
+          {prompt:"beugel",answer:"brace, braces (AmE)"},
+          {prompt:"bleek",answer:"pale"},
+          {prompt:"bril",answer:"glasses"},
+          {prompt:"gezichtsbeharing",answer:"facial hair"},
+          {prompt:"haviksneus",answer:"hooked nose"},
+          {prompt:"hazenlip",answer:"harelip"},
+          {prompt:"jukbeenderen",answer:"cheekbones"},
+          {prompt:"lang (gezicht)",answer:"long"},
+          {prompt:"mager (gezicht)",answer:"thin"},
+          {prompt:"ovaal",answer:"oval"},
+          {prompt:"rond",answer:"round"},
+          {prompt:"snor",answer:"moustache/mustache"},
+          {prompt:"spits/geprononceerd",answer:"sharp features"},
+          {prompt:"sproeten",answer:"freckles"},
+          {prompt:"stoppelbaard",answer:"stubble, stubbly beard"},
+          {prompt:"vierkant",answer:"square"},
+          {prompt:"vooruitstekende tanden",answer:"buck-toothed"},
+          {prompt:"wallen",answer:"bags under the eyes"},
+
+          /* ogen/oren */
+          {prompt:"ogen",answer:"eyes"},
+          {prompt:"diepliggende",answer:"deep-set"},
+          {prompt:"groenbruin",answer:"hazel"},
+          {prompt:"rood (doorlopen)",answer:"bloodshot"},
+          {prompt:"scheel",answer:"squint, cross-eyed"},
+          {prompt:"uitpuilende",answer:"bulging"},
+          {prompt:"oren",answer:"ears"},
+          {prompt:"flaporen",answer:"protruding ears, ears that stick out"},
+          {prompt:"klein (oren)",answer:"small"},
+
+          /* haar type */
+          {prompt:"haartype",answer:"hair type"},
+          {prompt:"dik (haar)",answer:"thick"},
+          {prompt:"fijn (haar)",answer:"thin/fine"},
+          {prompt:"dichte krullen",answer:"tight curls"},
+          {prompt:"glad",answer:"smooth"},
+          {prompt:"golvend",answer:"wavy"},
+          {prompt:"kroes",answer:"frizzy"},
+          {prompt:"krullend",answer:"curly"},
+          {prompt:"losse krullen",answer:"loose curls"},
+          {prompt:"steil",answer:"straight"},
+
+          /* haarkleur */
+          {prompt:"HAARKLEUR",answer:"HAIR COLOUR"},
+          {prompt:"donker (haar)",answer:"dark"},
+          {prompt:"blond",answer:"blond, fair"},
+          {prompt:"donkerblond",answer:"light brown"},
+          {prompt:"gebleekt",answer:"bleached"},
+          {prompt:"geverfd",answer:"dyed"},
+          {prompt:"rossig",answer:"sandy/strawberry blond"},
+
+          /* haarstijl */
+          {prompt:"haarstijl",answer:"hair style"},
+          {prompt:"bakkebaarden",answer:"sideburns"},
+          {prompt:"geschoren",answer:"shaven"},
+          {prompt:"inhammen",answer:"receding hairline"},
+          {prompt:"kaal",answer:"bald"},
+          {prompt:"krans (kale plek)",answer:"bald crown"},
+          {prompt:"militair kapsel",answer:"crew-cut"},
+          {prompt:"permanent",answer:"perm"},
+          {prompt:"pony",answer:"fringe, bangs (AmE)"},
+          {prompt:"pruik",answer:"wig"},
+          {prompt:"staart",answer:"ponytail"},
+          {prompt:"stekels",answer:"spikes / spiky hair"},
+          {prompt:"vlechten",answer:"plaits, braids (AmE)"},
+
+          /* huidskleur / etniciteit (neutraal) */
+          {prompt:"Aziatisch",answer:"Asian"},
+          {prompt:"blank",answer:"white (Caucasian)"},
+          {prompt:"donkere huid",answer:"dark-skinned"},
+          {prompt:"getint",answer:"light brown"},
+          {prompt:"mediterraan",answer:"Mediterranean"},
+          {prompt:"zwart",answer:"black"},
+          {prompt:"Noord-Afrikaans",answer:"North African"},
+          {prompt:"zongebrand",answer:"sun-tanned"},
+
+          /* kleding & kenmerken */
+          {prompt:"kleding",answer:"clothing"},
+          {prompt:"bloes",answer:"blouse (only for women)"},
+          {prompt:"bovenkleding voor vrouwen",answer:"top"},
+          {prompt:"broek",answer:"trousers, pants (AmE) (a pair of)"},
+          {prompt:"korte broek",answer:"shorts"},
+          {prompt:"mouwen",answer:"sleeves"},
+          {prompt:"overhemd",answer:"shirt"},
+          {prompt:"spijkerjasje",answer:"denim/jeans jacket"},
+          {prompt:"spijkerbroek",answer:"jeans (a pair of)"},
+          {prompt:"vest",answer:"cardigan"},
+          {prompt:"zonnebril",answer:"sunglasses"},
+          {prompt:"baard",answer:"beard"},
+          {prompt:"buitenlands accent",answer:"foreign accent"},
+          {prompt:"kleine moedervlek",answer:"mole"},
+          {prompt:"kuiltjes",answer:"dimples"},
+          {prompt:"litteken",answer:"scar"},
+          {prompt:"moedervlek",answer:"birthmark"},
+          {prompt:"piercing",answer:"piercing"},
+          {prompt:"puistjes",answer:"pimples"},
+          {prompt:"schor/hees",answer:"hoarse"},
+          {prompt:"snor (nogmaals)",answer:"moustache/mustache"},
+          {prompt:"sproeten (nogmaals)",answer:"freckles"},
+          {prompt:"stotteren",answer:"to stutter"},
+          {prompt:"tatoeage(s)",answer:"tattoo(s)"},
+          {prompt:"trekt met z’n been",answer:"walks with a limp"},
+          {prompt:"wond",answer:"wound"},
+          {prompt:"wratten",answer:"warts"},
+
+          /* lichaamsdelen */
+          {prompt:"haar (haren)",answer:"hair"},
+          {prompt:"voorhoofd",answer:"forehead"},
+          {prompt:"oren",answer:"ears"},
+          {prompt:"wenkbrauwen",answer:"eyebrows"},
+          {prompt:"wimpers",answer:"eyelashes"},
+          {prompt:"wang",answer:"cheek"},
+          {prompt:"kaak",answer:"jaw"},
+          {prompt:"mond",answer:"mouth"},
+          {prompt:"tand",answer:"tooth"},
+          {prompt:"tanden",answer:"teeth"},
+          {prompt:"lippen",answer:"lips"},
+          {prompt:"kin",answer:"chin"},
+          {prompt:"nek",answer:"neck"},
+          {prompt:"keel",answer:"throat"},
+          {prompt:"schouder",answer:"shoulder"},
+          {prompt:"bovenarm",answer:"upper arm"},
+          {prompt:"elleboog",answer:"elbow"},
+          {prompt:"onderarm",answer:"forearm"},
+          {prompt:"pols",answer:"wrist"},
+          {prompt:"hand",answer:"hand"},
+          {prompt:"palm",answer:"palm"},
+          {prompt:"vinger",answer:"finger"},
+          {prompt:"wijsfinger",answer:"index finger"},
+          {prompt:"duim",answer:"thumb"},
+          {prompt:"borst",answer:"chest"},
+          {prompt:"buik",answer:"stomach, belly"},
+          {prompt:"taille",answer:"waist"},
+          {prompt:"dij(been)",answer:"thigh/upper leg"},
+          {prompt:"knie",answer:"knee"},
+          {prompt:"kuit",answer:"calf/calves"},
+          {prompt:"onderbeen",answer:"lower leg"},
+          {prompt:"enkel",answer:"ankle"},
+          {prompt:"voet/voeten",answer:"foot/feet"},
+          {prompt:"teen/tenen",answer:"toe/toes"},
+          {prompt:"rug",answer:"back"},
+          {prompt:"ruggewervel",answer:"spine"},
+          {prompt:"billen",answer:"buttocks"},
+          {prompt:"nagel",answer:"nail"},
+          {prompt:"scheen",answer:"shin"}
+        ]
+      },
+
+      "Personal Information": {
+        type: "pairs",
+        items: [
+          {prompt:"Wat is uw voornaam?",answer:"What’s your first name?"},
+          {prompt:"Kunt u dat voor me spellen a.u.b.?",answer:"Could you spell that for me, please?"},
+          {prompt:"Wat is uw achternaam?",answer:"What’s your last name?"},
+          {prompt:"(tegen een vrouw) Is dat uw meisjesnaam of uw aangetrouwde naam?",answer:"Is that your maiden name or your married name?"},
+          {prompt:"Heeft u meer (voor)namen?",answer:"Do you have any other names? (of: Do you have a middle name?)"},
+          {prompt:"Wat is het adres waar u geregistreerd staat?",answer:"What’s your home address?"},
+          {prompt:"Wat is het adres waar u tijdelijk verblijft?",answer:"What’s your current address?"},
+          {prompt:"Wat is uw postcode?",answer:"What’s your zip code?"},
+          {prompt:"Welke (woon)plaats woont u?",answer:"What city do you live in?"},
+          {prompt:"Wat is uw geboortedatum?",answer:"What’s your date of birth? (of: When were you born?)"},
+          {prompt:"Wat is uw geboorteplaats?",answer:"What’s your place of birth? (of: Where were you born?)"},
+          {prompt:"Hoe kunnen we u bereiken?",answer:"How can we reach you? (of: Where can we reach you?)"},
+          {prompt:"Wat is uw telefoonnummer?",answer:"What’s your telephone number?"},
+          {prompt:"Wat is uw emailadres?",answer:"What’s your e-mail address?"}
+        ]
+      }
+    };
+
+    /* ===========
+       STATE & UI
+       =========== */
+    let currentCategory = null;
+    let items = [];
+    let idx = 0;
+    let results = [];
+
+    const menuEl = document.getElementById('menu');
+    const quizEl = document.getElementById('quiz');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const toggleLearn = document.getElementById('toggleLearn');
+
+    const qaCard = document.getElementById('qaCard');
+    const progressEl = document.getElementById('progress');
+    const questionEl = document.getElementById('question');
+    const learnArea = document.getElementById('learnArea');
+    const learnAnswerEl = document.getElementById('learnAnswer');
+    const testArea = document.getElementById('testArea');
+    const inputsWrap = document.getElementById('inputs');
+    const confirmBtn = document.getElementById('confirmBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const feedbackEl = document.getElementById('feedback');
+
+    const resultsBox = document.getElementById('results');
+    const summaryEl = document.getElementById('summary');
+    const resultsTable = document.getElementById('resultsTable');
+
+		function selectCategory(catName){
+  currentCategory = data[catName];
+  items = currentCategory?.items ? [...currentCategory.items] : [];
+  
+  // Shuffle-optie toepassen
+  const shuffleBox = document.getElementById('toggleShuffle');
+  if (shuffleBox && shuffleBox.checked) {
+    items = items.sort(() => Math.random() - 0.5);
+  }
+
+      idx = 0;
+      results = [];
+      menuEl.classList.add('hidden');
+	  document.getElementById('shuffleBar')?.classList.add('hidden'); // verberg op quizpagina
+      quizEl.classList.remove('hidden');
+      resultsBox.classList.add('hidden');
+      categoryTitle.textContent = catName;
+      toggleLearn.checked = false; // start in toetsmodus
+      renderQuestion();
+    }
+
+    function goBack(){
+      menuEl.classList.remove('hidden');
+	  document.getElementById('shuffleBar')?.classList.remove('hidden'); // weer zichtbaar op home
+      quizEl.classList.add('hidden');
+      feedbackEl.textContent = "";
+      results = [];
+    }
+
+    /* ===========
+       TOLERANT CHECK
+       =========== */
+    function normalize(s){
+      if(!s) return "";
+      return s
+        .toLowerCase()
+        .replace(/\(.*?\)/g,"")              // verwijder ( ... )
+        .replace(/[^a-z0-9\s']/g," ")        // verwijder leestekens
+        .replace(/\s+/g," ")                 // collapse whitespace
+        .trim();
+    }
+    function levenshtein(a,b){
+      const A=a.split(""), B=b.split("");
+      const n=A.length, m=B.length;
+      if(!n) return m; if(!m) return n;
+      const row=Array(m+1).fill(0);
+      for(let j=0;j<=m;j++) row[j]=j;
+      for(let i=1;i<=n;i++){
+        let prev=row[0]; row[0]=i;
+        for(let j=1;j<=m;j++){
+          const cur=row[j];
+          const cost=A[i-1]===B[j-1]?0:1;
+          row[j]=Math.min(row[j]+1,row[j-1]+1,prev+cost);
+          prev=cur;
+        }
+      }
+      return row[m];
+    }
+    // haal alternatieven uit antwoord (/, (of: ...), + volledige string)
+    function expandAlternatives(answer){
+      const base = answer;
+      const parts = [];
+      parts.push(base);
+      const ofRegex = /\(of:\s*([^)]*?)\)/gi;
+      let m;
+      while((m = ofRegex.exec(base)) !== null){
+        if(m[1]) parts.push(m[1]);
+      }
+      const all = new Set();
+      for(const p of parts){
+        const noPar = p.replace(/\(.*?\)/g,"");
+        noPar.split(/[\/,]/).forEach(bit=>{
+          const t = bit.trim();
+          if(t) all.add(t);
+        });
+        const full = noPar.trim();
+        if(full) all.add(full);
+      }
+      const norm = Array.from(all).map(normalize).filter(Boolean);
+      return Array.from(new Set(norm));
+    }
+    function tolerantMatch(user, correct){
+      const userN = normalize(user);
+      if(!userN) return false;
+      const options = expandAlternatives(correct);
+      for(const opt of options){
+        if(!opt) continue;
+        if(userN === opt) return true;
+        if(opt.includes(userN) || userN.includes(opt)) return true;
+        const d = levenshtein(userN, opt);
+        const thresh = Math.max(2, Math.floor(opt.length * 0.18));
+        if(d <= thresh) return true;
+      }
+      return false;
+    }
+
+    /* ===========
+       RENDER
+       =========== */
+    function renderProgress(){
+      progressEl.textContent = items.length ? `Vraag ${idx+1} van ${items.length}` : '';
+    }
+
+    function renderQuestion(){
+      feedbackEl.textContent = "";
+      nextBtn.classList.add('hidden');
+      renderProgress();
+
+      if(!items.length){
+        questionEl.textContent = "Nog geen vragen in deze categorie.";
+        learnArea.classList.add('hidden');
+        testArea.classList.add('hidden');
+        confirmBtn.classList.add('hidden');
+        return;
+      }
+
+      const item = items[idx];
+
+      if(currentCategory.type === 'pairs'){
+        questionEl.textContent = item.prompt;
+
+        if(toggleLearn.checked){
+          // LEER
+          learnArea.classList.remove('hidden');
+          learnAnswerEl.textContent = item.answer;
+          testArea.classList.add('hidden');
+          confirmBtn.classList.add('hidden');
+          nextBtn.classList.remove('hidden');
+        } else {
+          // TOETS
+          learnArea.classList.add('hidden');
+          testArea.classList.remove('hidden');
+          confirmBtn.classList.remove('hidden');
+          nextBtn.classList.add('hidden');
+          inputsWrap.innerHTML = '';
+          const inp = document.createElement('input');
+          inp.type = 'text';
+          inp.placeholder = 'Typ hier het Engelse antwoord...';
+          inp.autocomplete = 'off';
+          inputsWrap.appendChild(inp);
+          inp.focus();
+        }
+      } else if(currentCategory.type === 'missing'){
+        questionEl.textContent = item.prompt;
+        const blanksInPrompt = (item.prompt.match(/\.\.\.\.\./g) || []).length;
+        const count = Math.max(blanksInPrompt, item.answers.length);
+
+        if(toggleLearn.checked){
+          // LEER
+          learnArea.classList.remove('hidden');
+          learnAnswerEl.innerHTML = item.answers.map((a,i)=>`(${i+1}) ${a}`).join(' • ');
+          testArea.classList.add('hidden');
+          confirmBtn.classList.add('hidden');
+          nextBtn.classList.remove('hidden');
+        } else {
+          // TOETS
+          learnArea.classList.add('hidden');
+          testArea.classList.remove('hidden');
+          confirmBtn.classList.remove('hidden');
+          nextBtn.classList.add('hidden');
+          inputsWrap.innerHTML = '';
+          for(let i=0;i<count;i++){
+            const inp = document.createElement('input');
+            inp.type = 'text';
+            inp.placeholder = `Antwoord ${i+1}`;
+            inp.autocomplete = 'off';
+            inputsWrap.appendChild(inp);
+          }
+          inputsWrap.firstElementChild?.focus();
+        }
+      }
+    }
+
+    function onConfirm(){
+      if(toggleLearn.checked) return;
+      const item = items[idx];
+
+      if(currentCategory.type === 'pairs'){
+        const user = inputsWrap.querySelector('input')?.value || '';
+        const ok = tolerantMatch(user, item.answer);
+
+        results.push({prompt:item.prompt,type:'pairs',userAnswers:[user],correctAnswers:[item.answer],ok:[ok]});
+
+        feedbackEl.innerHTML = ok
+          ? `<span class="green">✅ Goed!</span> — ${item.answer}`
+          : `<span class="red">❌ Fout.</span> — ${item.answer}<br><span class="small">Jouw: "${escapeHtml(user)}"</span>`;
+        nextBtn.classList.remove('hidden');
+
+      } else if(currentCategory.type === 'missing'){
+        const expected = item.answers;
+        const inputs = Array.from(inputsWrap.querySelectorAll('input'));
+        const userArr = inputs.map(i => i.value || '');
+        const okArr = userArr.map((u,i) => tolerantMatch(u, expected[i] || ''));
+        results.push({prompt:item.prompt,type:'missing',userAnswers:userArr,correctAnswers:expected,ok:okArr});
+
+        const lines = okArr.map((ok,i)=>{
+          const good = escapeHtml(expected[i] || '');
+          const yours = escapeHtml(userArr[i] || '');
+          return ok
+            ? `<div><span class="green">(${i+1}) ✅ Goed</span> — ${good}</div>`
+            : `<div><span class="red">(${i+1}) ❌ Fout</span> — ${good} <span class="small">(Jouw: "${yours}")</span></div>`;
+        }).join("");
+        feedbackEl.innerHTML = lines;
+        nextBtn.classList.remove('hidden');
+      }
+    }
+
+    function onNext(){
+      idx++;
+      if(idx >= items.length){ showResults(); return; }
+      renderQuestion();
+    }
+
+    function showResults(){
+      questionEl.textContent = "Klaar!";
+      learnArea.classList.add('hidden');
+      testArea.classList.add('hidden');
+      confirmBtn.classList.add('hidden');
+      nextBtn.classList.add('hidden');
+
+      const totalItems = results.length;
+      const totalBlanks = results.reduce((acc,r)=> acc + r.ok.length, 0);
+      const good = results.reduce((acc,r)=> acc + r.ok.filter(Boolean).length, 0);
+      const wrong = totalBlanks - good;
+
+      resultsBox.classList.remove('hidden');
+      summaryEl.innerHTML = `Goed: <b>${good}</b> • Fout: <b>${wrong}</b> • Totaal vragen: <b>${totalItems}</b> • Totaal invulvelden: <b>${totalBlanks}</b>`;
+
+      const rows = results.map(r=>{
+        if(r.type==='pairs'){
+          const status = r.ok[0] ? '<span class="green">Goed</span>' : '<span class="red">Fout</span>';
+          return `
+            <tr>
+              <td><b>${escapeHtml(r.prompt)}</b></td>
+              <td>${status}</td>
+              <td>${escapeHtml(r.correctAnswers[0])}</td>
+              <td>${escapeHtml(r.userAnswers[0] || '-')}</td>
+            </tr>`;
+        } else {
+          const blocks = r.correctAnswers.map((c,i)=>{
+            const ok = r.ok[i];
+            const st = ok ? 'green' : 'red';
+            return `<div><b>(${i+1})</b> <span class="${st}">${ok?'Goed':'Fout'}</span> — ${escapeHtml(c)} <span class="small">Jouw: ${escapeHtml(r.userAnswers[i]||'-')}</span></div>`;
+          }).join("");
+          return `
+            <tr>
+              <td><b>${escapeHtml(r.prompt)}</b></td>
+              <td colspan="3">${blocks}</td>
+            </tr>`;
+        }
+      }).join("");
+
+      resultsTable.innerHTML = `
+        <thead>
+          <tr>
+            <th>Vraag</th>
+            <th>Status</th>
+            <th>Juiste antwoord</th>
+            <th>Jouw antwoord</th>
+          </tr>
+        </thead>
+        <tbody>${rows}</tbody>`;
+    }
+
+    toggleLearn.addEventListener('change', renderQuestion);
+
+    document.addEventListener('keydown', e=>{
+      if(quizEl.classList.contains('hidden')) return;
+      if(e.key === 'Enter'){
+        e.preventDefault();
+        const inTest = !toggleLearn.checked;
+        if(inTest){
+          if(nextBtn.classList.contains('hidden')) onConfirm();
+          else onNext();
+        } else {
+          onNext();
+        }
+      }
+    });
+
+    function escapeHtml(s){
+      return (s??'').toString()
+        .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+  </script>
+</body>
+</html>
